@@ -11,10 +11,12 @@ using tink.CoreApi;
 class SinchSmsPusher<Data:{}> implements pushx.Pusher<Data> {
 	
 	var auth:HeaderField;
+	var contentType:HeaderField;
 	var toMessage:pushx.Payload<Data>->String;
 	
 	public function new(applicationKey, applicationSecret, ?toMessage) {
 		auth = new HeaderField(AUTHORIZATION, 'Basic ${Base64.encode(Bytes.ofString('$applicationKey:$applicationSecret')).toString()}');
+		contentType = new HeaderField(CONTENT_TYPE, 'application/json');
 		this.toMessage = toMessage != null ? toMessage : _toMessage;
 	}
 	
@@ -34,15 +36,15 @@ class SinchSmsPusher<Data:{}> implements pushx.Pusher<Data> {
 		return Future.ofMany([for(id in ids) 
 			fetch('https://messagingapi.sinch.com/v1/sms/$id', {
 				method: POST,
-				headers: [auth, contentLength],
+				headers: [auth, contentLength, contentType],
 				body: body,
-			})
+			}).all()
 		])
 			.map(function(outcomes) {
 				var errors = [];
 				for(i in 0...outcomes.length) {
 					switch outcomes[i] {
-						case Success(_): // fine
+						case Success(res): // fine
 						case Failure(e): errors.push({id: ids[i], error: e});
 					}
 				}

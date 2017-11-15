@@ -1,0 +1,19 @@
+{
+  "name": "pushx_sinch",
+  "license": "MIT",
+  "tags": [
+    "push",
+    "sinch"
+  ],
+  "classPath": "src",
+  "contributors": [
+    "kevinresol"
+  ],
+  "releasenote": "initial release",
+  "version": "0.0.0",
+  "dependencies": {
+    "tink_json": "",
+    "tink_http_fetch": "",
+    "pushx_core": ""
+  }
+}

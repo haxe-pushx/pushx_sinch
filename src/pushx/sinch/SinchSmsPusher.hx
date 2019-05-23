@@ -44,11 +44,14 @@ class SinchSmsPusher<Data:{}> implements pushx.Pusher<Data> {
 				var errors = [];
 				for(i in 0...outcomes.length) {
 					switch outcomes[i] {
-						case Success(res): // fine
-						case Failure(e): errors.push({id: ids[i], error: e});
+						case Success(res):
+							if(res.header.statusCode >= 400)
+								errors.push({id: ids[i], type: pushx.Result.ErrorType.Others(Error.withData(500, 'Sinch Errored', {code: res.header.statusCode, message: res.body.toString()}))});
+						case Failure(e):
+							errors.push({id: ids[i], type: pushx.Result.ErrorType.Others(e)});
 					}
 				}
-				return {errors: errors}
+				return ({errors: errors}:pushx.Result);
 			});
 	}
 	
